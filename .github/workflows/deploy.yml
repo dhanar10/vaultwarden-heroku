@@ -1,0 +1,12 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy Vaultwarden to Heroku
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: bash deploy.sh
