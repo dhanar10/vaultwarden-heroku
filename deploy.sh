@@ -29,7 +29,7 @@ heroku config:set ORG_ATTACHMENT_LIMIT=0 -a "${APP_NAME}"
 heroku config:set USER_ATTACHMENT_LIMIT=0 -a "${APP_NAME}"
 
 # This is a private instance, disable sign ups
-heroku config:set SIGNUPS_ALLOWED=true -a "${APP_NAME}"
+heroku config:set SIGNUPS_ALLOWED=false -a "${APP_NAME}"
 
 heroku container:login
 heroku container:push web -a "${APP_NAME}"
