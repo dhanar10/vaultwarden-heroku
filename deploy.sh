@@ -28,6 +28,9 @@ heroku config:set ADMIN_TOKEN="$ADMIN_TOKEN" -a "${APP_NAME}" | sed "s@$ADMIN_TO
 heroku config:set ORG_ATTACHMENT_LIMIT=0 -a "${APP_NAME}"   
 heroku config:set USER_ATTACHMENT_LIMIT=0 -a "${APP_NAME}"
 
+# This is a private instance, disable sign ups
+heroku config:set SIGNUPS_ALLOWED=true -a "${APP_NAME}"
+
 heroku container:login
 heroku container:push web -a "${APP_NAME}"
 heroku container:release web -a "${APP_NAME}"
