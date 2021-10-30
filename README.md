@@ -1,12 +1,12 @@
 # heroku-vaultwarden
 
-Deploy Vaultwarden to Heroku using GitHub Actions with only HEROKU_API_KEY and HEROKU_APP_NAME
+Deploy a Vaultwarden private instance to Heroku using GitHub Actions with only HEROKU_API_KEY and HEROKU_APP_NAME
 
 # Prerequisites
 
 1. Heroku verified account (1000 free dyno hours)
 2. HEROKU_API_KEY (Heroku [Account Settings](https://dashboard.heroku.com/account) -> API Key -> Reveal)
-3. HEROKU_APP_NAME (deployment will fail if the name is already taken)
+3. HEROKU_APP_NAME (if the name is already taken, deployment will fail)
 
 # Deployment
 
