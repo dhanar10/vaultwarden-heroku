@@ -5,25 +5,29 @@
 set -e
 set -o pipefail
 
-HVW_APP_NAME="$1"
+APP_NAME="$1"
 
-heroku create "${HVW_APP_NAME}"
+ADMIN_TOKEN="$(openssl rand -base64 48)"
 
-if ! (heroku addons -a "${HVW_APP_NAME}" | grep "heroku-postgresql"); then
-  heroku addons:create heroku-postgresql -a "$HVW_APP_NAME"
+heroku create "${APP_NAME}"
+
+if ! (heroku addons -a "${APP_NAME}" | grep -q "heroku-postgresql"); then
+  heroku addons:create heroku-postgresql -a "$APP_NAME"
 fi
 
-if ! (heroku addons -a "${HVW_APP_NAME}" | grep "autobus"); then
-  heroku access:add heroku@autobus.io -a "$HVW_APP_NAME" --permissions operate
-  heroku addons:create autobus -a "$HVW_APP_NAME"
+if ! (heroku addons -a "${APP_NAME}" | grep -q "autobus"); then
+  heroku access:add heroku@autobus.io -a "$APP_NAME" --permissions operate
+  heroku addons:create autobus -a "$APP_NAME"
 fi
 
-HVW_ADMIN_TOKEN="$(openssl rand -base64 48)"
+heroku config:set DOMAIN="https://${APP_NAME}.herokuapp.com" -a "${APP_NAME}"
+heroku config:set DATABASE_MAX_CONNS=7 -a "${APP_NAME}"
+heroku config:set ADMIN_TOKEN="$ADMIN_TOKEN" -a "${APP_NAME}" | sed "s@$ADMIN_TOKEN@$(echo $ADMIN_TOKEN | sed 's/./*/g')@"
 
-heroku config:set ADMIN_TOKEN="$HVW_ADMIN_TOKEN" -a "${HVW_APP_NAME}" | sed "s@$HVW_ADMIN_TOKEN@$(echo $HVW_ADMIN_TOKEN | sed 's/./X/g')@"
-heroku config:set DATABASE_MAX_CONNS=7 -a "${HVW_APP_NAME}"
-heroku config:set DOMAIN="https://${HVW_APP_NAME}.herokuapp.com" -a "${HVW_APP_NAME}"
+# Heroku filesystem is ephemeral, disable attachment
+heroku config:set ORG_ATTACHMENT_LIMIT=0 -a "${APP_NAME}"   
+heroku config:set USER_ATTACHMENT_LIMIT=0 -a "${APP_NAME}"
 
 heroku container:login
-heroku container:push web -a "${HVW_APP_NAME}"
-heroku container:release web -a "${HVW_APP_NAME}"
+heroku container:push web -a "${APP_NAME}"
+heroku container:release web -a "${APP_NAME}"
