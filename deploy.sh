@@ -26,14 +26,10 @@ heroku config:set ADMIN_TOKEN="$ADMIN_TOKEN" -a "${APP_NAME}" >/dev/null    # XX
 
 # Create and store persistent RSA key in Heroku config (fixes session JWT forced logout, etc)
 if ! (heroku config:get RSA_KEY_TGZ -a "${APP_NAME}" | grep -q .); then
-  RSA_PEM="rsa_key"
-  RSA_PRIV_DER=$RSA_PEM.der
-  RSA_PUB_DER=$RSA_PEM.pub.der
   RSA_TEMP_DIR=$(mktemp -d)
   pushd $RSA_TEMP_DIR
-  openssl genrsa -out $RSA_PEM 
-  openssl rsa -in $RSA_PEM -outform DER -out $RSA_PRIV_DER
-  openssl rsa -in $RSA_PRIV_DER -inform DER -RSAPublicKey_out -outform DER -out $RSA_PUB_DER
+  openssl genrsa -out rsa_key.pem 2048
+  openssl rsa -in rsa_key.pem -outform PEM -pubout -out rsa_key.pub.pem
   RSA_KEY_TGZ="$(tar zcvf - rsa_key* | base64)"
   heroku config:set RSA_KEY_TGZ="$RSA_KEY_TGZ" -a "${APP_NAME}" >/dev/null    # XXX Hide config set RSA_KEY_TGZ output
   popd
