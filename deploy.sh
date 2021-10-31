@@ -7,7 +7,7 @@ set -o pipefail
 
 APP_NAME="$1"
 
-heroku create "${APP_NAME}"   # TODO Upgrade scenario
+heroku create "${APP_NAME}" || true   # XXX If APP_NAME already taken, assume upgrade
 
 if ! (heroku addons -a "${APP_NAME}" | grep -q "heroku-postgresql"); then
   heroku addons:create heroku-postgresql -a "$APP_NAME"
