@@ -22,10 +22,10 @@ ADMIN_TOKEN="$(openssl rand -base64 48)"
 
 heroku config:set DOMAIN="https://${APP_NAME}.herokuapp.com" -a "${APP_NAME}"
 heroku config:set DATABASE_MAX_CONNS=7 -a "${APP_NAME}"
-heroku config:set ADMIN_TOKEN="$ADMIN_TOKEN" -a "${APP_NAME}" | sed "s@$ADMIN_TOKEN@$(echo $ADMIN_TOKEN | sed 's/./*/g')@"    # Mask ADMIN_TOKEN
+heroku config:set ADMIN_TOKEN="$ADMIN_TOKEN" -a "${APP_NAME}" >/dev/null    # XXX Hide config set ADMIN_TOKEN output
 
 # Create and store persistent RSA key in Heroku config (fixes session JWT forced logout, etc)
-if ! (heroku config:get RSA_KEY_TGZ | grep -q .); then
+if ! (heroku config:get RSA_KEY_TGZ -a "${APP_NAME}" | grep -q .); then
   RSA_PEM="rsa_key"
   RSA_PRIV_DER=$RSA_PEM.der
   RSA_PUB_DER=$RSA_PEM.pub.der
@@ -35,7 +35,7 @@ if ! (heroku config:get RSA_KEY_TGZ | grep -q .); then
   openssl rsa -in $RSA_PEM -outform DER -out $RSA_PRIV_DER
   openssl rsa -in $RSA_PRIV_DER -inform DER -RSAPublicKey_out -outform DER -out $RSA_PUB_DER
   RSA_KEY_TGZ="$(tar zcvf - rsa_key* | base64)"
-  heroku config:set RSA_KEY_TGZ="$RSA_KEY_TGZ" -a "${APP_NAME}" | sed "s@$RSA_KEY_TGZ@$(echo $RSA_KEY_TGZ | sed 's/./*/g')@"    # Mask RSA_KEY_TGZ
+  heroku config:set RSA_KEY_TGZ="$RSA_KEY_TGZ" -a "${APP_NAME}" >/dev/null    # XXX Hide config set RSA_KEY_TGZ output
   popd
   rm -rf $RSA_TEMP_DIR
 fi
