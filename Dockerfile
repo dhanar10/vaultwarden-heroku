@@ -4,4 +4,4 @@ ADD start-heroku.sh /start-heroku.sh
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
-CMD ["/start-heroku.sh"]
+CMD ["/bin/sh", "/start-heroku.sh"]
